@@ -4,6 +4,10 @@
 var width = 600;
 var height = 400;
 var enemyNum = 20;
+var score = 0;
+var highScore = 0;
+var collisions = 0;
+var speed = 1300;
 
 var svg = d3.select("body")
     .append("svg")
@@ -27,7 +31,7 @@ var createEnemies = function(data) {
     .remove();
 
   enemies.transition()
-    .duration(1000)
+    .duration(speed)
     .tween("collisionTween", function(d) {
 
       var enemy = d3.select(this);
@@ -67,19 +71,24 @@ function checkForCollision() {
   var playerXPosition = Math.floor(player.attr("cx")); 
   var playerYPosition = Math.floor(player.attr("cy"));
 
-  var collision = false;
   enemies.each(function(d) {
     var enemy = d3.select(this)
     var enemyXPosition = enemy.attr("cx");
     var enemyYPosition = enemy.attr("cy");
 
     var distance = Math.sqrt((enemyXPosition - playerXPosition) * (enemyXPosition - playerXPosition) + (enemyYPosition - playerYPosition) * (enemyYPosition - playerYPosition));
-    if (distance < 25) {
-      console.log(distance);
+    if (distance < 15) {
+      collide();
     }  
   });
-  return collision;
 }  
+
+var collide = _.throttle(function() {
+  collisions++;
+  score = 0;
+}, 700, {trailing: false});
+
+
 
 // Create Player
 svg.append("circle")
@@ -107,7 +116,23 @@ setInterval(function() {
   // Make them follow the data
   createEnemies(enemyData);
 
-}, 1000);
+}, speed);
+
+setInterval(function() {
+  score++;
+  d3.select(".current span")
+    .text(score);
+
+  if (score > highScore) {
+    highScore = score;
+    d3.select(".high span")
+    .text(highScore);
+  }
+
+  d3.select(".collisions span")
+    .text(collisions);
+
+}, 50)
 
 setInterval(function() {
   var isCollision = checkForCollision();
