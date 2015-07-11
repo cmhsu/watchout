@@ -10,6 +10,15 @@
       <div class="current">Current score: <span>0</span></div>
       <div class="collisions">Collisions: <span>0</span></div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect('http://localhost:3000');
+      var id = null;
+      socket.on('id', function (idObj) {
+        id = idObj.id;
+      });
+
+    </script>
     <script src="lib/d3.js" charset="utf-8"></script>
     <script src="lib/jquery-2.1.4.js" charset="utf-8"></script>
     <script src="lib/underscore.js" charset="utf-8"></script>
