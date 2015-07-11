@@ -1,8 +1,8 @@
 // start slingin' some d3 here.
 
 // Create SVG
-var width = 700;
-var height = 500;
+var width = 600;
+var height = 400;
 var enemyNum = 20;
 
 var svg = d3.select("body")
@@ -23,17 +23,29 @@ var createEnemies = function(data) {
     .attr("fill", "blue")
     .classed("enemy", true);
 
-  enemies.transition()
-    .duration(1000)
-
-    .attr("cx", function(d) { return d.x; })
-    .attr("cy", function(d) { return d.y; })
-
-
   enemies.exit()
     .remove();
 
-}
+  enemies.transition()
+    .duration(1000)
+    .tween("collisionTween", function(d) {
+
+      var enemy = d3.select(this);
+      var startPositionX = Number(enemy.attr("cx"));
+      var startPositionY = Number(enemy.attr("cy"));
+      var endPositionX = d.x;
+      var endPositionY = d.y;
+
+      return function(time) {
+
+        checkForCollision();
+        var newX = Math.floor(startPositionX + (endPositionX - startPositionX) * time);
+        var newY = Math.floor(startPositionY + (endPositionY - startPositionY) * time);  
+        enemy.attr("cx", newX);
+        enemy.attr("cy", newY);
+      }
+    });
+};
 
 var assignEnemyData = function() {
 
@@ -49,6 +61,26 @@ var assignEnemyData = function() {
   return data;
 }
 
+function checkForCollision() {
+  var enemies = svg.selectAll(".enemy");
+  var player = d3.select(".player");
+  var playerXPosition = Math.floor(player.attr("cx")); 
+  var playerYPosition = Math.floor(player.attr("cy"));
+
+  var collision = false;
+  enemies.each(function(d) {
+    var enemy = d3.select(this)
+    var enemyXPosition = enemy.attr("cx");
+    var enemyYPosition = enemy.attr("cy");
+
+    var distance = Math.sqrt((enemyXPosition - playerXPosition) * (enemyXPosition - playerXPosition) + (enemyYPosition - playerYPosition) * (enemyYPosition - playerYPosition));
+    if (distance < 25) {
+      console.log(distance);
+    }  
+  });
+  return collision;
+}  
+
 // Create Player
 svg.append("circle")
   .attr("cx", width * Math.random())
@@ -59,11 +91,14 @@ svg.append("circle")
   .classed("draggable", true);
 
 var drag = d3.behavior.drag()
-    .on("drag", dragmove)
+    .on("drag", dragmove);
 d3.selectAll(".draggable").call(drag);
 
 
 // Game Loop
+var enemyData = assignEnemyData();
+createEnemies(enemyData);
+
 setInterval(function() {
 
   // Create and assign new Enemy Data
@@ -77,7 +112,7 @@ setInterval(function() {
 setInterval(function() {
   var isCollision = checkForCollision();
 
-}, 1);
+}, 16);
 
 function dragmove(d) {
   if (d3.event.x > 10 && d3.event.x < width - 10 && d3.event.y > 10 && d3.event.y < height - 10) {
@@ -87,23 +122,7 @@ function dragmove(d) {
     }
 }
 
-function checkForCollision() {
-  var enemies = svg.selectAll(".enemy");
-  var player = svg.selectAll(".player");
-  var playerXPosition = player.attr("cx"); 
-  var playerYPosition = player.attr("cy");
-  var collision = false;
-  enemies.each(function(d) {
-    var enemy = d3.select(this)
-    var enemyXPosition = enemy.attr("cx");
-    var enemyYPosition = enemy.attr("cy");
-    var distance = Math.sqrt((d.x - playerXPosition) * (d.x - playerXPosition) + (d.y - playerYPosition) * (d.y - playerYPosition));
-    if (distance < 30) {
-      alert('hiiiiiiiiiiiiiiii');
-    }  
-  });
-  return collision;
-}  
+
     
 
 
