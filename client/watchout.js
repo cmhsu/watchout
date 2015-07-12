@@ -16,8 +16,6 @@ var svg = d3.select("body")
       .style("height", height)
       .style("background-color", "aliceblue")
 
-var player = Player();
-
 // Create Enemies
 var updateEnemies = function(data) {
 
@@ -46,7 +44,7 @@ var updateEnemies = function(data) {
 
       return function(time) {
 
-        //checkForCollision();
+        checkForCollision();
         var newX = Math.floor(startPositionX + (endPositionX - startPositionX) * time);
         var newY = Math.floor(startPositionY + (endPositionY - startPositionY) * time);  
         enemy.attr("x", newX);
@@ -55,31 +53,38 @@ var updateEnemies = function(data) {
     });
 };
 
+var colors = ['blue', 'red', 'orange', 'pink', 'purple', 'black', 'green', 'brown']
+
 var updatePlayers = function(data) {
   var players = svg.selectAll(".player")
     .data(data, function(d) {return d.id;});
 
   players.enter()
     .append("circle")
-    .attr("cx", function(d) { return d.cx; })
-    .attr("cy", function(d) { return d.cy; })
     .attr("r", 10)
-    .attr("fill", "orange")
+    .each(function(d) {
+      d3.select(this).classed("class" + d.id, true)
+    })
     .classed("player", true)
     .classed("draggable", true);
 
   players.exit()
     .remove()
+
+  players.attr("cx", function(d) { return d.cx; })
+    .attr("cy", function(d) { return d.cy; })
+    .attr("fill", function(d) {
+      return colors[d.id];
+    });
 };
 
 socket.on("allPlayerPos", function(data) {
-  console.log(data);
   updatePlayers(data);
 });
 
 var checkForCollision = function() {
   var enemies = svg.selectAll(".enemy");
-  var tempPlayer = d3.select("." + id);
+  var tempPlayer = d3.select(".class" + id);
   var playerXPosition = Math.floor(tempPlayer.attr("cx")); 
   var playerYPosition = Math.floor(tempPlayer.attr("cy"));
 
@@ -97,10 +102,6 @@ var checkForCollision = function() {
 
 socket.on('enemyData', function (data) {
   updateEnemies(data);
-});
-
-socket.on("allPlayerPos", function(data) {
-
 });
 
 setInterval(function() {

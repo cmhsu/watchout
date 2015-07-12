@@ -53,11 +53,16 @@ var createEnemyData = function() {
 }
 
 var currentID = 0;
-var players = {}
+var players = [];
 io.on("connection", function(socket) {
-  players[currentID] = {cx: 50, cy: 50, id: currentID};
+  players[currentID] = {cx: Math.random() * 100, cy: Math.random() * 100, id: currentID};
   io.sockets.emit('allPlayerPos', players);
   socket.emit('id', currentID);
+
+  socket.on("playerPos", function(data) {
+    players[data.id] = data;
+    io.sockets.emit('allPlayerPos', players);
+  })
   currentID++;
 });
 
@@ -66,11 +71,6 @@ io.sockets.emit('enemyData', createEnemyData());
 setInterval(function() {
   io.sockets.emit('enemyData', createEnemyData());
 }, 1900);
-
-io.sockets.on("playerPos", function(data) {
-  players[data.id] = data;
-  io.sockets.emit('allPlayerPos', players);
-})
 
 
 

@@ -3,7 +3,7 @@ var Player = function() {
 
   var dragmove = function(d) {
     if (d3.event.x > 10 && d3.event.x < width - 10 && d3.event.y > 10 && d3.event.y < height - 10) {
-      d3.select(".player")
+      d3.select(".class" + id)
           .attr("cx", d3.event.x)
           .attr("cy", d3.event.y);
       
@@ -11,7 +11,7 @@ var Player = function() {
         cx: d3.event.x,
         cy: d3.event.y,
         id: id
-      })
+      });
     }
   }
 
@@ -31,7 +31,7 @@ var Player = function() {
 
   var drag = d3.behavior.drag()
     .on("drag", dragmove);
-  d3.selectAll("." + id).call(drag);
+  d3.select(".class" + id).call(drag);
 
   return obj;
 };
