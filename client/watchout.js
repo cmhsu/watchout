@@ -98,7 +98,7 @@ var checkForCollision = function() {
       player.collide();
     }  
   });
-}  
+}
 
 socket.on('enemyData', function (data) {
   updateEnemies(data);
@@ -120,7 +120,7 @@ setInterval(function() {
 
 }, 50)
 
-    
+
 
 
 
