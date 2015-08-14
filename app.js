@@ -37,7 +37,6 @@ app.get('/shuriken.png', function (req, res) {
 });
 
 
-
 var createEnemyData = function() {
 
   var data = [];
